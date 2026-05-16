@@ -11,6 +11,9 @@
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
+# Resolve script directory so relative paths work from any CWD
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # ══════════════════════════════════════════════════════════
 #  CONFIG — EDIT THESE BEFORE RUNNING
 # ══════════════════════════════════════════════════════════
@@ -97,7 +100,7 @@ step "Build and push container image via Cloud Build"
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE_NAME}:latest"
 
 # Cloud Build uses the Backend/ directory as build context
-gcloud builds submit "../Backend" \
+gcloud builds submit "${SCRIPT_DIR}/../Backend" \
   --tag="${IMAGE}" \
   --region="${REGION}"
 echo "✓ Image built and pushed: ${IMAGE}"
@@ -162,7 +165,7 @@ fi
 if ! bq show "${PROJECT_ID}:${BQ_DATASET}.${BQ_TABLE}" &>/dev/null; then
   bq mk --table \
     "${PROJECT_ID}:${BQ_DATASET}.${BQ_TABLE}" \
-    "../infra/bq_schema.json"
+    "${SCRIPT_DIR}/bq_schema.json"
 fi
 echo "✓ BigQuery dataset and table ready"
 
