@@ -1,0 +1,11 @@
+[
+  {"name": "doc_id",           "type": "STRING",    "mode": "REQUIRED",  "description": "Unique document ID derived from GCS object name"},
+  {"name": "transaction_date", "type": "DATE",      "mode": "NULLABLE",  "description": "Date of transaction extracted from receipt (YYYY-MM-DD)"},
+  {"name": "merchant_name",    "type": "STRING",    "mode": "NULLABLE",  "description": "Name of merchant or vendor from receipt"},
+  {"name": "items_json",       "type": "STRING",    "mode": "NULLABLE",  "description": "JSON string array of line items [{item_name, quantity, price, total_item_price}]"},
+  {"name": "total_amount",     "type": "FLOAT64",   "mode": "NULLABLE",  "description": "Total transaction amount (float, no currency symbol)"},
+  {"name": "expense_category", "type": "STRING",    "mode": "NULLABLE",  "description": "One of: Raw Materials, Logistics, Utilities, Marketing, Others"},
+  {"name": "coach_tip",        "type": "STRING",    "mode": "NULLABLE",  "description": "FinVibe Coach 2-sentence financial tip in Bahasa Indonesia"},
+  {"name": "gcs_object",       "type": "STRING",    "mode": "NULLABLE",  "description": "Full GCS URI of the original receipt image"},
+  {"name": "processed_at",     "type": "TIMESTAMP", "mode": "NULLABLE",  "description": "UTC timestamp when this record was processed"}
+]
