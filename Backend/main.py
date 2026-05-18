@@ -9,6 +9,9 @@ import json
 import logging
 from datetime import datetime, timezone, timedelta
 
+import google.auth
+from google.auth.transport import requests as google_auth_requests
+
 import vertexai
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
@@ -84,7 +87,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # TODO: restrict to your frontend domain in production
+    allow_origins=["https://finvibe-baa9d.web.app"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -254,20 +258,29 @@ async def health_check():
 async def get_upload_url(filename: str, content_type: str = "image/jpeg"):
     """
     Generate a short-lived GCS signed URL for direct browser-to-GCS upload.
-    The frontend uses this URL to PUT the file directly, which then triggers
-    the GCS → Pub/Sub → Cloud Run webhook automatically.
+    Uses IAM token signing — compatible with Cloud Run (no service account key needed).
     """
     try:
-        bucket   = gcs.bucket(GCS_BUCKET)
+        bucket    = gcs.bucket(GCS_BUCKET)
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         blob_name = f"receipts/{timestamp}_{filename}"
         blob      = bucket.blob(blob_name)
+
+        # Refresh ADC credentials to get a valid access token for signing
+        credentials, _ = google.auth.default(
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+        auth_req = google_auth_requests.Request()
+        credentials.refresh(auth_req)
 
         url = blob.generate_signed_url(
             version="v4",
             expiration=timedelta(minutes=15),
             method="PUT",
             content_type=content_type,
+            # Use IAM token signing — works in Cloud Run without a key file
+            service_account_email=credentials.service_account_email,
+            access_token=credentials.token,
         )
         logger.info("Signed URL created for: %s", blob_name)
         return {"upload_url": url, "object_name": blob_name}

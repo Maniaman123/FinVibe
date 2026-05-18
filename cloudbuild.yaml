@@ -1,0 +1,49 @@
+steps:
+  # Step 0: Build the Docker image from the Backend/ subdirectory
+  - name: "gcr.io/cloud-builders/docker"
+    dir: "Backend"
+    args:
+      - build
+      - -t
+      - "asia-southeast1-docker.pkg.dev/projek-juaravibecoding/finvibe-repo/finvibe-backend:latest"
+      - "."
+
+  # Step 1: Push the image to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - "asia-southeast1-docker.pkg.dev/projek-juaravibecoding/finvibe-repo/finvibe-backend:latest"
+
+  # Step 2: Deploy to Cloud Run
+  # Requires Cloud Build SA to have roles/run.admin and roles/iam.serviceAccountUser.
+  # If this step fails with permission denied, run the grant commands below once:
+  #
+  #   PROJECT_NUMBER=$(gcloud projects describe projek-juaravibecoding --format="value(projectNumber)")
+  #   CB_SA="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
+  #   gcloud projects add-iam-policy-binding projek-juaravibecoding --member="serviceAccount:${CB_SA}" --role="roles/run.admin"
+  #   gcloud projects add-iam-policy-binding projek-juaravibecoding --member="serviceAccount:${CB_SA}" --role="roles/iam.serviceAccountUser"
+  #
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - finvibe-backend
+      - --image=asia-southeast1-docker.pkg.dev/projek-juaravibecoding/finvibe-repo/finvibe-backend:latest
+      - --region=asia-southeast1
+      - --platform=managed
+      - --service-account=finvibe-sa@projek-juaravibecoding.iam.gserviceaccount.com
+      - --set-env-vars=GCP_PROJECT_ID=projek-juaravibecoding,GCP_REGION=asia-southeast1,GCS_BUCKET_NAME=finvibe-receipts-projek-juaravibecoding,BQ_DATASET=finvibe_dataset,BQ_TABLE=transactions
+      - --allow-unauthenticated
+      - --memory=1Gi
+      - --cpu=1
+      - --concurrency=80
+      - --min-instances=0
+      - --max-instances=10
+      - --timeout=300
+
+images:
+  - "asia-southeast1-docker.pkg.dev/projek-juaravibecoding/finvibe-repo/finvibe-backend:latest"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

@@ -3,7 +3,8 @@ import { getFirestore, collection, onSnapshot, query, orderBy } from "firebase/f
 import {
   getAuth,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
   signOut,
@@ -40,11 +41,20 @@ export const loginWithEmail = (email, password) =>
   signInWithEmailAndPassword(auth, email, password);
 
 /**
- * Sign in with Google via a pop-up window.
- * @returns {Promise<UserCredential>}
+ * Sign in with Google via redirect (avoids COOP popup issues on Firebase Hosting).
+ * Call getRedirectResult() on app load to handle the result after redirect.
+ * @returns {Promise<void>}
  */
 export const loginWithGoogle = () =>
-  signInWithPopup(auth, googleProvider);
+  signInWithRedirect(auth, googleProvider);
+
+/**
+ * Resolve the Google redirect result after returning from sign-in.
+ * Should be called once on app startup.
+ * @returns {Promise<UserCredential | null>}
+ */
+export const resolveGoogleRedirect = () =>
+  getRedirectResult(auth);
 
 /**
  * Sign out the current user.

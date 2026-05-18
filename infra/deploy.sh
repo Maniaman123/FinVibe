@@ -179,13 +179,13 @@ echo "✓ Pub/Sub push subscription wired to Cloud Run"
 
 step "Create BigQuery dataset and transaction table"
 if ! bq ls --dataset "${PROJECT_ID}:${BQ_DATASET}" &>/dev/null; then
-  bq --location="${REGION}" mk --dataset "${PROJECT_ID}:${BQ_DATASET}"
+  bq --location="${REGION}" mk --dataset "${PROJECT_ID}:${BQ_DATASET}" 2>/dev/null || true
 fi
 
 if ! bq show "${PROJECT_ID}:${BQ_DATASET}.${BQ_TABLE}" &>/dev/null; then
   bq mk --table \
     "${PROJECT_ID}:${BQ_DATASET}.${BQ_TABLE}" \
-    "${SCRIPT_DIR}/bq_schema.json"
+    "${SCRIPT_DIR}/bq_schema.json" 2>/dev/null || true
 fi
 echo "✓ BigQuery dataset and table ready"
 

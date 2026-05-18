@@ -22,6 +22,7 @@ import {
   logout,
   subscribeToAuthState,
   subscribeToTransactions,
+  resolveGoogleRedirect,
 } from "./lib/firebase";
 
 // ── Loading Spinner ────────────────────────────────────────────────────────────
@@ -181,8 +182,11 @@ export default function App() {
   // Live Firestore data
   const [transactions, setTransactions] = useState([]);
 
-  // ── 1. Global Auth State Listener ─────────────────────────────────────────
+  // ── 1. Global Auth State Listener + Google Redirect Result ───────────────
   useEffect(() => {
+    // Resolve pending Google redirect sign-in (fires once on page load)
+    resolveGoogleRedirect().catch(() => {});
+
     const unsubscribeAuth = subscribeToAuthState((firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false); // first auth resolution complete — safe to render
