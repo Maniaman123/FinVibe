@@ -1,16 +1,18 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
+
 
 // TODO: Replace with your actual Firebase config from Firebase Console
 // Note: You only need this for the read-only real-time listener.
 // Uploads and writes are handled securely via our FastAPI backend.
 const firebaseConfig = {
-  apiKey: "AIzaSy_YOUR_API_KEY",
-  authDomain: "projek-juaravibecoding.firebaseapp.com",
-  projectId: "projek-juaravibecoding",
-  storageBucket: "projek-juaravibecoding.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
+  apiKey: "AIzaSyBy2ZUcPvny0lxeJYFcT8dPTf4REcW7u9k",
+  authDomain: "finvibe-baa9d.firebaseapp.com",
+  projectId: "finvibe-baa9d",
+  storageBucket: "finvibe-baa9d.firebasestorage.app",
+  messagingSenderId: "956218500440",
+  appId: "1:956218500440:web:d7448595c5d55b051a712d"
 };
 
 const app = initializeApp(firebaseConfig);

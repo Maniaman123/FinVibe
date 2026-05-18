@@ -8,7 +8,7 @@ import { useState, useCallback } from "react";
 import TransactionCard from "../components/TransactionCard";
 
 // TODO: Replace with your deployed Cloud Run URL
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = "https://finvibe-backend-pczqnj65aa-as.a.run.app";
 
 export default function Dashboard({ transactions = [] }) {
   const [isDragging, setIsDragging] = useState(false);

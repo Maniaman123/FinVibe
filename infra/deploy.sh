@@ -87,6 +87,26 @@ for ROLE in \
 done
 echo "✓ IAM roles granted to ${SA_EMAIL}"
 
+# Ensure the default Compute service account has required permissions for Cloud Build
+PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format="value(projectNumber)")
+COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${COMPUTE_SA}" \
+  --role="roles/logging.logWriter" \
+  --condition=None 2>/dev/null || true
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${COMPUTE_SA}" \
+  --role="roles/storage.admin" \
+  --condition=None 2>/dev/null || true
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${COMPUTE_SA}" \
+  --role="roles/artifactregistry.writer" \
+  --condition=None 2>/dev/null || true
+echo "✓ IAM roles granted to Compute Service Account (${COMPUTE_SA})"
+
 step "Create Artifact Registry Docker repository"
 if ! gcloud artifacts repositories describe "${AR_REPO}" --location="${REGION}" &>/dev/null; then
   gcloud artifacts repositories create "${AR_REPO}" \
