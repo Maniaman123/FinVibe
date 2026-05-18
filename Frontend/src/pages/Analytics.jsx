@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { MonthlyTrendChart, CategoryDonutChart, SparklineChart } from "../components/AnalyticsChart";
+import FadeContent from "../components/FadeContent";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const COLORS = {
@@ -257,7 +258,8 @@ export default function Analytics({ transactions = null, monthlyData = null }) {
         </div>
 
         {/* ── KPI Row ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <FadeContent blur={true} duration={1000} delay={0.1} ease="power2.out" initialOpacity={0}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <KpiCard
             title="Total Pengeluaran"
             value={formatIDRCompact(totalSpend)}
@@ -284,10 +286,12 @@ export default function Analytics({ transactions = null, monthlyData = null }) {
             subtitle={donutData[0] ? formatIDRCompact(donutData[0].value) : ""}
             color={COLORS[donutData[0]?.name] ?? "#958ea0"}
           />
-        </div>
+          </div>
+        </FadeContent>
 
         {/* ── Charts Row ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+        <FadeContent blur={true} duration={1000} delay={0.2} ease="power2.out" initialOpacity={0}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
           <div className="lg:col-span-2">
             <MonthlyTrendChart data={monthly} />
           </div>
@@ -295,6 +299,7 @@ export default function Analytics({ transactions = null, monthlyData = null }) {
             <CategoryDonutChart data={donutData} />
           </div>
         </div>
+        </FadeContent>
 
         {/* ── Category Filter ── */}
         <div className="flex flex-wrap gap-2 mb-4">
@@ -319,14 +324,16 @@ export default function Analytics({ transactions = null, monthlyData = null }) {
         </div>
 
         {/* ── Bottom Row: Table + Recent ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          <div className="lg:col-span-3">
-            <CategoryTable transactions={filtered} />
+        <FadeContent blur={true} duration={1000} delay={0.4} ease="power2.out" initialOpacity={0}>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-3">
+              <CategoryTable transactions={filtered} />
+            </div>
+            <div className="lg:col-span-2">
+              <RecentList transactions={filtered} />
+            </div>
           </div>
-          <div className="lg:col-span-2">
-            <RecentList transactions={filtered} />
-          </div>
-        </div>
+        </FadeContent>
 
       </div>
     </div>

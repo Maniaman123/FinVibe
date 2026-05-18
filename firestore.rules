@@ -1,0 +1,19 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Transactions Collection ───────────────────────────────────────────────
+    // Only authenticated users may read or write transaction documents.
+    match /transactions/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ── Default: Deny Everything Else ────────────────────────────────────────
+    // Any collection not explicitly listed above is completely locked down.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+  }
+}

@@ -6,6 +6,7 @@
 
 import { useState, useCallback } from "react";
 import TransactionCard from "../components/TransactionCard";
+import FadeContent from "../components/FadeContent";
 
 // TODO: Replace with your deployed Cloud Run URL
 const API_BASE_URL = "https://finvibe-backend-pczqnj65aa-as.a.run.app";
@@ -156,8 +157,17 @@ export default function Dashboard({ transactions = [] }) {
                 <p style={{ color: "#958ea0" }}>Belum ada transaksi. Silakan unggah struk pertama Anda.</p>
               </div>
             ) : (
-              transactions.map((tx) => (
-                <TransactionCard key={tx.id || tx.doc_id} transaction={tx} />
+              transactions.map((tx, index) => (
+                <FadeContent 
+                  key={tx.id || tx.doc_id}
+                  blur={true} 
+                  duration={1000} 
+                  delay={index * 150} 
+                  ease="power2.out" 
+                  initialOpacity={0}
+                >
+                  <TransactionCard transaction={tx} />
+                </FadeContent>
               ))
             )}
           </div>
