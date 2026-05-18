@@ -5,35 +5,27 @@ steps:
     args:
       - build
       - -t
-      - "asia-southeast1-docker.pkg.dev/projek-juaravibecoding/finvibe-repo/finvibe-backend:latest"
+      - "asia-southeast1-docker.pkg.dev/finvibe-baa9d/finvibe-repo/finvibe-backend:latest"
       - "."
 
   # Step 1: Push the image to Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
     args:
       - push
-      - "asia-southeast1-docker.pkg.dev/projek-juaravibecoding/finvibe-repo/finvibe-backend:latest"
+      - "asia-southeast1-docker.pkg.dev/finvibe-baa9d/finvibe-repo/finvibe-backend:latest"
 
   # Step 2: Deploy to Cloud Run
-  # Requires Cloud Build SA to have roles/run.admin and roles/iam.serviceAccountUser.
-  # If this step fails with permission denied, run the grant commands below once:
-  #
-  #   PROJECT_NUMBER=$(gcloud projects describe projek-juaravibecoding --format="value(projectNumber)")
-  #   CB_SA="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
-  #   gcloud projects add-iam-policy-binding projek-juaravibecoding --member="serviceAccount:${CB_SA}" --role="roles/run.admin"
-  #   gcloud projects add-iam-policy-binding projek-juaravibecoding --member="serviceAccount:${CB_SA}" --role="roles/iam.serviceAccountUser"
-  #
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
     args:
       - run
       - deploy
       - finvibe-backend
-      - --image=asia-southeast1-docker.pkg.dev/projek-juaravibecoding/finvibe-repo/finvibe-backend:latest
+      - --image=asia-southeast1-docker.pkg.dev/finvibe-baa9d/finvibe-repo/finvibe-backend:latest
       - --region=asia-southeast1
       - --platform=managed
-      - --service-account=finvibe-sa@projek-juaravibecoding.iam.gserviceaccount.com
-      - --set-env-vars=GCP_PROJECT_ID=projek-juaravibecoding,GCP_REGION=asia-southeast1,GCS_BUCKET_NAME=finvibe-receipts-projek-juaravibecoding,BQ_DATASET=finvibe_dataset,BQ_TABLE=transactions
+      - --service-account=finvibe-sa@finvibe-baa9d.iam.gserviceaccount.com
+      - --set-env-vars=GCP_PROJECT_ID=finvibe-baa9d,GCP_REGION=asia-southeast1,GCS_BUCKET_NAME=finvibe-receipts-finvibe-baa9d,BQ_DATASET=finvibe_dataset,BQ_TABLE=transactions
       - --allow-unauthenticated
       - --memory=1Gi
       - --cpu=1
@@ -43,7 +35,7 @@ steps:
       - --timeout=300
 
 images:
-  - "asia-southeast1-docker.pkg.dev/projek-juaravibecoding/finvibe-repo/finvibe-backend:latest"
+  - "asia-southeast1-docker.pkg.dev/finvibe-baa9d/finvibe-repo/finvibe-backend:latest"
 
 options:
   logging: CLOUD_LOGGING_ONLY

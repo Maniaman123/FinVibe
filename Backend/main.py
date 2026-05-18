@@ -31,7 +31,8 @@ BQ_DATASET    = os.environ.get("BQ_DATASET", "finvibe_dataset")
 BQ_TABLE      = os.environ.get("BQ_TABLE", "transactions")
 
 # ── GCP Client Initialization ─────────────────────────────────────────────────
-vertexai.init(project=PROJECT_ID, location=REGION)
+# Vertex AI: us-central1 required — Gemini 1.5 Pro/Flash unavailable in asia-southeast1.
+vertexai.init(project="finvibe-baa9d", location="us-central1")
 db  = firestore.Client(project=PROJECT_ID)
 bq  = bigquery.Client(project=PROJECT_ID)
 gcs = storage.Client(project=PROJECT_ID)
