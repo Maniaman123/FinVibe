@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import Landing from "./pages/Landing";
+import Login from "./pages/Login";
 import { subscribeToTransactions, subscribeToAuthState, logout } from "./lib/firebase";
 
 function App() {
   const [activeTab, setActiveTab]       = useState("dashboard");
+  const [page, setPage]                 = useState("landing"); // "landing" | "login"
   const [transactions, setTransactions] = useState([]);
   const [user, setUser]                 = useState(undefined); // undefined = loading
 
@@ -52,13 +54,12 @@ function App() {
     );
   }
 
-  // ── Unauthenticated: Show Landing Page ───────────────────────────────────────
+  // ── Unauthenticated: Show Landing or Login ─────────────────────────────────
   if (!user) {
-    return <Landing onNavigate={(page) => {
-      // Navigate to login – handled by Login.jsx (to be added next)
-      // For now, redirect to a simple placeholder
-      window.location.hash = page;
-    }} />;
+    if (page === "login") {
+      return <Login onLoginSuccess={() => {}} />;
+    }
+    return <Landing onNavigate={(p) => setPage(p)} />;
   }
 
   // ── Authenticated: Show Main App ─────────────────────────────────────────────

@@ -392,7 +392,7 @@ export default function Landing({ onNavigate }) {
           </span>
         </div>
         <p className="text-xs font-mono" style={{ color: "#494454" }}>
-          Dibuat dengan ❤️ untuk JuaraVibeCoding Hackathon · Google Cloud Run ·
+          Dibuat dengan untuk JuaraVibeCoding Hackathon · Google Cloud Run ·
           Firebase · Gemini AI
         </p>
       </footer>
