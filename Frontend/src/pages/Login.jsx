@@ -79,7 +79,7 @@ function GoogleIcon() {
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────────
-export default function Login({ onLoginSuccess }) {
+export default function Login({ onLoginSuccess, onBack }) {
   const [tab,      setTab]      = useState("signin"); // "signin" | "signup"
   const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
@@ -148,6 +148,17 @@ export default function Login({ onLoginSuccess }) {
           background: "radial-gradient(circle, rgba(208,188,255,0.06) 0%, transparent 70%)",
         }}
       />
+
+      {/* ── Back link ── */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1.5 mb-6 text-xs font-mono transition-colors hover:brightness-125"
+          style={{ color: "#958ea0" }}
+        >
+          ← Kembali ke beranda
+        </button>
+      )}
 
       {/* ── Logo ── */}
       <div className="flex items-center gap-3 mb-8">
