@@ -11,6 +11,7 @@ import {
   loginWithEmail,
   loginWithGoogle,
 } from "../lib/firebase";
+import { signInWithPopup } from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 // ── Error message map (Firebase error codes → Bahasa Indonesia) ───────────────
@@ -123,14 +124,30 @@ export default function Login({ onLoginSuccess, onBack }) {
   };
 
   // ── Google OAuth ─────────────────────────────────────────────────────────────
+  // Use popup on localhost (avoids redirect-loop during dev).
+  // Use redirect on production (avoids COOP popup-block on Firebase Hosting).
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError("");
     try {
-      await loginWithGoogle();
-      onLoginSuccess?.();
+      if (isLocalhost) {
+        // Popup resolves immediately — call success right away.
+        await signInWithPopup(auth, googleProvider);
+        onLoginSuccess?.();
+      } else {
+        // Redirect: page will reload; App.jsx resolveGoogleRedirect() handles session.
+        // Do NOT call onLoginSuccess here — it will never be reached after redirect.
+        await loginWithGoogle();
+      }
     } catch (err) {
-      setError(friendlyError(err));
+      // auth/popup-closed-by-user is not a real error — just reset state.
+      if (err?.code !== "auth/popup-closed-by-user") {
+        setError(friendlyError(err));
+      }
     } finally {
       setLoading(false);
     }

@@ -184,13 +184,26 @@ export default function App() {
 
   // ── 1. Global Auth State Listener + Google Redirect Result ───────────────
   useEffect(() => {
-    // Resolve pending Google redirect sign-in (fires once on page load)
-    resolveGoogleRedirect().catch(() => {});
+    // We must wait for getRedirectResult() to finish before trusting the
+    // first onAuthStateChanged(null) — otherwise a redirect login causes
+    // a flash back to the landing page before the session is established.
+    let redirectResolved = false;
 
     const unsubscribeAuth = subscribeToAuthState((firebaseUser) => {
       setUser(firebaseUser);
-      setLoading(false); // first auth resolution complete — safe to render
+      // Only dismiss the loading screen after the redirect check is done.
+      if (redirectResolved) setLoading(false);
     });
+
+    // Resolve any pending Google redirect (runs once on every app load).
+    resolveGoogleRedirect()
+      .catch(() => {})
+      .finally(() => {
+        redirectResolved = true;
+        // Auth state has already settled — safe to show the UI now.
+        setLoading(false);
+      });
+
     return () => unsubscribeAuth();
   }, []);
 
