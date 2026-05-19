@@ -17,7 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # ══════════════════════════════════════════════════════════
 #  CONFIG — EDIT THESE BEFORE RUNNING
 # ══════════════════════════════════════════════════════════
-PROJECT_ID="finvibe-baa9d"             # Firebase project ID
+PROJECT_ID="projek-juaravibecoding"      # GCP project with billing (Cloud Run + Build)
 REGION="asia-southeast1"              # Jakarta region (lowest latency for ID)
 GCS_BUCKET="finvibe-receipts-${PROJECT_ID}"
 AR_REPO="finvibe-repo"

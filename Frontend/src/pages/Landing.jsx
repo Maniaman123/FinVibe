@@ -1,82 +1,95 @@
 /**
  * Landing.jsx
  * Premium dark-mode landing page for FinVibe.
- * Design tokens: #131315 bg | #e5e1e4 text | #958ea0 dimmed | #d0bcff accent | #4edea3 success
+ * Background: ShapeGrid animated canvas (React Bits).
+ * No emojis — clean, minimal, professional.
  */
+
+import ShapeGrid from "../components/ShapeGrid";
 
 const FEATURES = [
   {
-    icon: "📄",
-    title: "AI OCR Instan",
-    desc: "Upload foto struk atau invoice — Gemini 1.5 Pro mengekstrak nama merchant, tanggal, dan total secara otomatis dalam hitungan detik.",
+    icon: null,
+    label: "OCR",
+    title: "Ekstraksi Struk Otomatis",
+    desc: "Upload foto struk atau invoice — Gemini 1.5 Pro mengekstrak merchant, tanggal, dan nominal secara akurat dalam hitungan detik.",
     accent: "#d0bcff",
-    glow: "rgba(208,188,255,0.12)",
+    glow: "rgba(208,188,255,0.10)",
   },
   {
-    icon: "⚡",
-    title: "Real-Time Sync",
-    desc: "Data transaksi langsung muncul di dashboard tanpa perlu refresh. Firestore memastikan bisnis Anda selalu up-to-date.",
+    icon: null,
+    label: "LIVE",
+    title: "Sinkronisasi Real-Time",
+    desc: "Data transaksi langsung tampil di dashboard tanpa refresh. Firestore memastikan bisnis Anda selalu up-to-date.",
     accent: "#4edea3",
-    glow: "rgba(78,222,163,0.12)",
+    glow: "rgba(78,222,163,0.10)",
   },
   {
-    icon: "🤖",
+    icon: null,
+    label: "AI",
     title: "FinVibe Coach",
-    desc: "Setiap struk dilengkapi saran keuangan 2 kalimat dari AI — tips penghematan dan peringatan anomali yang actionable.",
+    desc: "Setiap struk dilengkapi saran keuangan singkat dari AI — tips penghematan dan deteksi anomali yang actionable.",
     accent: "#c0c1ff",
-    glow: "rgba(192,193,255,0.12)",
+    glow: "rgba(192,193,255,0.10)",
   },
   {
-    icon: "📊",
+    icon: null,
+    label: "VIZ",
     title: "Analytics Mendalam",
     desc: "Visualisasikan pengeluaran per kategori dengan Donut Chart interaktif dan tren bulanan dalam Stacked Bar Chart.",
     accent: "#ffb4ab",
-    glow: "rgba(255,180,171,0.12)",
+    glow: "rgba(255,180,171,0.10)",
   },
   {
-    icon: "🗄️",
+    icon: null,
+    label: "DB",
     title: "Data Warehouse",
     desc: "Setiap transaksi otomatis diekspor ke BigQuery untuk analitik jangka panjang dan laporan bisnis skala enterprise.",
     accent: "#4edea3",
-    glow: "rgba(78,222,163,0.12)",
+    glow: "rgba(78,222,163,0.10)",
   },
   {
-    icon: "🔒",
+    icon: null,
+    label: "SEC",
     title: "Aman & Terenkripsi",
-    desc: "Autentikasi Firebase, Firestore Security Rules, dan signed URL GCS memastikan data UMKM Anda sepenuhnya terlindungi.",
+    desc: "Firebase Auth, Firestore Security Rules, dan signed URL GCS menjaga data UMKM Anda sepenuhnya terlindungi.",
     accent: "#d0bcff",
-    glow: "rgba(208,188,255,0.12)",
+    glow: "rgba(208,188,255,0.10)",
   },
 ];
 
 const STATS = [
   { value: "< 5s", label: "Waktu OCR rata-rata" },
-  { value: "5", label: "Kategori pengeluaran" },
+  { value: "6", label: "Fitur terintegrasi" },
   { value: "100%", label: "Serverless & scalable" },
   { value: "Real-time", label: "Sinkronisasi data" },
 ];
 
-// ── Feature Card ────────────────────────────────────────────────────────────────
-function FeatureCard({ icon, title, desc, accent, glow }) {
+// ── Feature Card ─────────────────────────────────────────────────────────────
+function FeatureCard({ label, title, desc, accent, glow }) {
   return (
     <div
-      className="rounded-2xl p-6 flex flex-col gap-3 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 group cursor-default"
+      className="rounded-2xl p-6 flex flex-col gap-3 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 cursor-default"
       style={{
-        background: `linear-gradient(135deg, ${glow} 0%, rgba(28,27,29,0.8) 100%)`,
-        border: `1px solid ${accent}25`,
+        background: `linear-gradient(135deg, ${glow} 0%, rgba(28,27,29,0.85) 100%)`,
+        border: `1px solid ${accent}22`,
         backdropFilter: "blur(12px)",
-        boxShadow: `0 4px 24px rgba(0,0,0,0.3)`,
       }}
     >
+      {/* Monospace label badge instead of emoji */}
       <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform duration-300 group-hover:scale-110"
-        style={{ background: `${glow}`, border: `1px solid ${accent}35` }}
+        className="w-fit px-2.5 py-0.5 rounded-md text-xs font-mono font-bold tracking-widest"
+        style={{
+          background: `${accent}18`,
+          color: accent,
+          border: `1px solid ${accent}30`,
+        }}
       >
-        {icon}
+        {label}
       </div>
       <h3
         className="text-base font-semibold"
-        style={{ color: "#e5e1e4", fontFamily: "'Geist', sans-serif" }}
+        style={{ color: "#e5e1e4", fontFamily: "'Geist', 'Inter', sans-serif" }}
       >
         {title}
       </h3>
@@ -87,13 +100,13 @@ function FeatureCard({ icon, title, desc, accent, glow }) {
   );
 }
 
-// ── Stat Badge ──────────────────────────────────────────────────────────────────
+// ── Stat Badge ───────────────────────────────────────────────────────────────
 function StatBadge({ value, label }) {
   return (
     <div className="flex flex-col items-center gap-1 px-6 py-4">
       <span
         className="text-3xl font-bold font-mono"
-        style={{ color: "#d0bcff", fontFamily: "'Geist', sans-serif" }}
+        style={{ color: "#d0bcff", fontFamily: "'Geist', 'Inter', sans-serif" }}
       >
         {value}
       </span>
@@ -104,19 +117,19 @@ function StatBadge({ value, label }) {
   );
 }
 
-// ── Main Component ──────────────────────────────────────────────────────────────
+// ── Main Component ────────────────────────────────────────────────────────────
 export default function Landing({ onNavigate }) {
   return (
     <div
       className="min-h-screen flex flex-col"
       style={{ background: "#131315", color: "#e5e1e4" }}
     >
-      {/* ── Navbar ── */}
+      {/* ── Sticky Navbar ── */}
       <nav
         className="sticky top-0 z-50 border-b backdrop-blur-md"
         style={{
-          borderColor: "rgba(73,68,84,0.5)",
-          background: "rgba(19,19,21,0.8)",
+          borderColor: "rgba(73,68,84,0.45)",
+          background: "rgba(19,19,21,0.80)",
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,14 +137,14 @@ export default function Landing({ onNavigate }) {
             {/* Logo */}
             <div className="flex items-center gap-3">
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
+                className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm select-none"
                 style={{ background: "#d0bcff", color: "#3c0091" }}
               >
                 F
               </div>
               <span
                 className="font-bold text-xl tracking-tight"
-                style={{ fontFamily: "'Geist', sans-serif" }}
+                style={{ fontFamily: "'Geist', 'Inter', sans-serif" }}
               >
                 FinVibe
               </span>
@@ -142,9 +155,9 @@ export default function Landing({ onNavigate }) {
               onClick={() => onNavigate("login")}
               className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-110 hover:scale-105 active:scale-95"
               style={{
-                background: "rgba(208,188,255,0.12)",
+                background: "rgba(208,188,255,0.10)",
                 color: "#d0bcff",
-                border: "1px solid rgba(208,188,255,0.25)",
+                border: "1px solid rgba(208,188,255,0.22)",
               }}
             >
               Masuk
@@ -153,121 +166,124 @@ export default function Landing({ onNavigate }) {
         </div>
       </nav>
 
-      {/* ── Hero Section ── */}
-      <section className="flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 pt-20 pb-12 relative overflow-hidden">
-        {/* Background glow orbs */}
-        <div
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(208,188,255,0.07) 0%, transparent 70%)",
-          }}
-        />
-        <div
-          className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(78,222,163,0.05) 0%, transparent 70%)",
-          }}
-        />
-
-        {/* Badge */}
-        <div
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono mb-8"
-          style={{
-            background: "rgba(208,188,255,0.1)",
-            border: "1px solid rgba(208,188,255,0.25)",
-            color: "#d0bcff",
-          }}
-        >
-          <span
-            className="w-1.5 h-1.5 rounded-full animate-pulse"
-            style={{ background: "#4edea3" }}
+      {/* ── Hero Section (ShapeGrid background) ── */}
+      <section className="relative flex flex-col items-center justify-center text-center px-4 sm:px-6 overflow-hidden"
+        style={{ minHeight: "88vh" }}
+      >
+        {/* ShapeGrid fills the entire hero */}
+        <div className="absolute inset-0 z-0">
+          <ShapeGrid
+            speed={0.3}
+            squareSize={44}
+            direction="diagonal"
+            borderColor="rgba(73,68,84,0.55)"
+            hoverFillColor="rgba(208,188,255,0.18)"
+            shape="square"
+            hoverTrailAmount={6}
           />
-          Powered by Gemini 1.5 Pro &amp; Firebase
         </div>
 
-        {/* Main Heading */}
-        <h1
-          className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight max-w-4xl mb-6"
-          style={{ fontFamily: "'Geist', sans-serif", color: "#e5e1e4" }}
-        >
-          Kelola Finansial UMKM{" "}
-          <span
-            className="relative inline-block"
+        {/* Overlay gradient so text remains legible */}
+        <div
+          className="absolute inset-0 z-10 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(19,19,21,0.35) 0%, rgba(19,19,21,0.82) 100%)",
+          }}
+        />
+
+        {/* Content sits above canvas + overlay */}
+        <div className="relative z-20 max-w-4xl mx-auto">
+          {/* Pill badge */}
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono mb-8"
             style={{
-              background: "linear-gradient(135deg, #d0bcff 0%, #4edea3 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              background: "rgba(208,188,255,0.08)",
+              border: "1px solid rgba(208,188,255,0.22)",
+              color: "#d0bcff",
             }}
           >
-            dengan Kekuatan AI
-          </span>
-        </h1>
+            <span
+              className="w-1.5 h-1.5 rounded-full animate-pulse"
+              style={{ background: "#4edea3" }}
+            />
+            Powered by Gemini 1.5 Pro &amp; Firebase
+          </div>
 
-        {/* Subtitle */}
-        <p
-          className="text-lg sm:text-xl max-w-2xl mb-10 leading-relaxed"
-          style={{ color: "#958ea0" }}
-        >
-          Unggah struk fisik, biarkan AI mengekstraknya secara otomatis, pantau
-          arus kas secara{" "}
-          <span style={{ color: "#e5e1e4" }}>real-time</span>, dan dapatkan
-          saran dari{" "}
-          <span style={{ color: "#d0bcff" }}>FinVibe Coach</span> — semua dalam
-          satu dashboard.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          {/* Primary CTA */}
-          <button
-            onClick={() => onNavigate("login")}
-            className="relative group px-8 py-3.5 rounded-xl text-base font-semibold transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: "linear-gradient(135deg, #d0bcff 0%, #b69eff 100%)",
-              color: "#3c0091",
-              boxShadow:
-                "0 0 0 0 rgba(208,188,255,0.4), 0 4px 24px rgba(208,188,255,0.3)",
-              fontFamily: "'Geist', sans-serif",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 0 0 6px rgba(208,188,255,0.15), 0 8px 32px rgba(208,188,255,0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 0 0 0 rgba(208,188,255,0.4), 0 4px 24px rgba(208,188,255,0.3)";
-            }}
+          {/* Headline */}
+          <h1
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6"
+            style={{ fontFamily: "'Geist', 'Inter', sans-serif", color: "#e5e1e4" }}
           >
-            Mulai Sekarang ➔
-          </button>
+            Kelola Finansial UMKM{" "}
+            <span
+              className="relative inline-block"
+              style={{
+                background: "linear-gradient(135deg, #d0bcff 0%, #4edea3 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              dengan Kekuatan AI
+            </span>
+          </h1>
 
-          {/* Secondary CTA */}
-          <a
-            href="#features"
-            className="px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-200 hover:brightness-125"
-            style={{
-              color: "#958ea0",
-              border: "1px solid #494454",
-            }}
+          {/* Sub-heading */}
+          <p
+            className="text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
+            style={{ color: "#958ea0" }}
           >
-            Lihat Fitur ↓
-          </a>
+            Unggah struk fisik, biarkan AI mengekstraknya secara otomatis,
+            pantau arus kas secara{" "}
+            <span style={{ color: "#e5e1e4" }}>real-time</span>, dan dapatkan
+            saran dari{" "}
+            <span style={{ color: "#d0bcff" }}>FinVibe Coach</span> — semua
+            dalam satu dashboard.
+          </p>
+
+          {/* CTA row */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={() => onNavigate("login")}
+              className="px-8 py-3.5 rounded-xl text-base font-semibold transition-all duration-300 hover:scale-105 active:scale-95"
+              style={{
+                background: "linear-gradient(135deg, #d0bcff 0%, #b69eff 100%)",
+                color: "#3c0091",
+                boxShadow: "0 4px 24px rgba(208,188,255,0.30)",
+                fontFamily: "'Geist', 'Inter', sans-serif",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.boxShadow =
+                  "0 0 0 6px rgba(208,188,255,0.14), 0 8px 32px rgba(208,188,255,0.42)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.boxShadow =
+                  "0 4px 24px rgba(208,188,255,0.30)";
+              }}
+            >
+              Mulai Sekarang &rarr;
+            </button>
+
+            <a
+              href="#features"
+              className="px-6 py-3.5 rounded-xl text-sm font-medium transition-all duration-200 hover:brightness-125"
+              style={{ color: "#958ea0", border: "1px solid #494454" }}
+            >
+              Lihat Fitur &darr;
+            </a>
+          </div>
         </div>
       </section>
 
       {/* ── Stats Strip ── */}
       <section
         className="border-y py-2"
-        style={{ borderColor: "#494454", background: "rgba(28,27,29,0.5)" }}
+        style={{ borderColor: "#494454", background: "rgba(28,27,29,0.55)" }}
       >
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x"
-            style={{ divideColor: "#494454" }}
-          >
-            {STATS.map((s) => (
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-[#494454]">
+            {STATS.map(s => (
               <StatBadge key={s.label} {...s} />
             ))}
           </div>
@@ -277,7 +293,6 @@ export default function Landing({ onNavigate }) {
       {/* ── Features Grid ── */}
       <section id="features" className="py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
           <div className="text-center mb-14">
             <p
               className="text-xs font-mono uppercase tracking-widest mb-3"
@@ -288,7 +303,7 @@ export default function Landing({ onNavigate }) {
             <h2
               className="text-3xl sm:text-4xl font-bold"
               style={{
-                fontFamily: "'Geist', sans-serif",
+                fontFamily: "'Geist', 'Inter', sans-serif",
                 color: "#e5e1e4",
               }}
             >
@@ -298,14 +313,13 @@ export default function Landing({ onNavigate }) {
               className="mt-4 text-base max-w-xl mx-auto"
               style={{ color: "#958ea0" }}
             >
-              Dari struk kertas lusuh hingga insight finansial yang tajam — FinVibe
-              menangani seluruh pipeline data Anda secara otomatis.
+              Dari struk kertas lusuh hingga insight finansial yang tajam —
+              FinVibe menangani seluruh pipeline data Anda secara otomatis.
             </p>
           </div>
 
-          {/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((f) => (
+            {FEATURES.map(f => (
               <FeatureCard key={f.title} {...f} />
             ))}
           </div>
@@ -319,23 +333,23 @@ export default function Landing({ onNavigate }) {
             className="rounded-3xl p-12 relative overflow-hidden"
             style={{
               background:
-                "linear-gradient(135deg, rgba(208,188,255,0.1) 0%, rgba(78,222,163,0.08) 100%)",
-              border: "1px solid rgba(208,188,255,0.2)",
+                "linear-gradient(135deg, rgba(208,188,255,0.09) 0%, rgba(78,222,163,0.07) 100%)",
+              border: "1px solid rgba(208,188,255,0.18)",
             }}
           >
-            {/* Glow */}
+            {/* Subtle top glow */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 0%, rgba(208,188,255,0.12) 0%, transparent 60%)",
+                  "radial-gradient(circle at 50% 0%, rgba(208,188,255,0.10) 0%, transparent 60%)",
               }}
             />
 
             <h2
               className="text-3xl sm:text-4xl font-bold mb-4 relative"
               style={{
-                fontFamily: "'Geist', sans-serif",
+                fontFamily: "'Geist', 'Inter', sans-serif",
                 color: "#e5e1e4",
               }}
             >
@@ -345,8 +359,8 @@ export default function Landing({ onNavigate }) {
               className="text-base mb-8 relative"
               style={{ color: "#958ea0" }}
             >
-              Bergabung dan mulai mengelola keuangan UMKM Anda dengan AI.
-              Gratis. Sekarang.
+              Bergabung dan mulai mengelola keuangan UMKM dengan AI. Gratis.
+              Sekarang.
             </p>
             <button
               onClick={() => onNavigate("login")}
@@ -354,19 +368,19 @@ export default function Landing({ onNavigate }) {
               style={{
                 background: "linear-gradient(135deg, #d0bcff 0%, #b69eff 100%)",
                 color: "#3c0091",
-                fontFamily: "'Geist', sans-serif",
-                boxShadow: "0 8px 32px rgba(208,188,255,0.35)",
+                fontFamily: "'Geist', 'Inter', sans-serif",
+                boxShadow: "0 8px 32px rgba(208,188,255,0.30)",
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 e.currentTarget.style.boxShadow =
-                  "0 0 0 6px rgba(208,188,255,0.15), 0 12px 40px rgba(208,188,255,0.5)";
+                  "0 0 0 6px rgba(208,188,255,0.14), 0 12px 40px rgba(208,188,255,0.48)";
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.boxShadow =
-                  "0 8px 32px rgba(208,188,255,0.35)";
+                  "0 8px 32px rgba(208,188,255,0.30)";
               }}
             >
-              Mulai Sekarang ➔
+              Mulai Sekarang &rarr;
             </button>
           </div>
         </div>
@@ -379,21 +393,21 @@ export default function Landing({ onNavigate }) {
       >
         <div className="flex items-center justify-center gap-2 mb-2">
           <div
-            className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold"
+            className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold select-none"
             style={{ background: "#d0bcff", color: "#3c0091" }}
           >
             F
           </div>
           <span
             className="font-semibold"
-            style={{ fontFamily: "'Geist', sans-serif", color: "#e5e1e4" }}
+            style={{ fontFamily: "'Geist', 'Inter', sans-serif", color: "#e5e1e4" }}
           >
             FinVibe
           </span>
         </div>
         <p className="text-xs font-mono" style={{ color: "#494454" }}>
-          Dibuat dengan untuk JuaraVibeCoding Hackathon · Google Cloud Run ·
-          Firebase · Gemini AI
+          Dibuat untuk JuaraVibeCoding Hackathon &middot; Google Cloud Run &middot; Firebase
+          &middot; Gemini AI
         </p>
       </footer>
     </div>
