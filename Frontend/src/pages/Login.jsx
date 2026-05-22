@@ -9,7 +9,6 @@ import {
   auth,
   googleProvider,
   loginWithEmail,
-  loginWithGoogle,
 } from "../lib/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -123,28 +122,22 @@ export default function Login({ onLoginSuccess, onBack }) {
     }
   };
 
-  // ── Google OAuth ─────────────────────────────────────────────────────────────
-  // Use popup on localhost (avoids redirect-loop during dev).
-  // Use redirect on production (avoids COOP popup-block on Firebase Hosting).
-  const isLocalhost =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-
+  // ── Google OAuth ─────────────────────────────────────────────────────────
+  // Always use signInWithPopup — it resolves as a clean Promise so
+  // App.jsx's onAuthStateChanged handles the navigation automatically.
+  // signInWithRedirect was causing a race condition: Firebase emits
+  // onAuthStateChanged(null) on page reload before the redirect token
+  // is verified, causing a premature render of Landing page.
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError("");
     try {
-      if (isLocalhost) {
-        // Popup resolves immediately — call success right away.
-        await signInWithPopup(auth, googleProvider);
-        onLoginSuccess?.();
-      } else {
-        // Redirect: page will reload; App.jsx resolveGoogleRedirect() handles session.
-        // Do NOT call onLoginSuccess here — it will never be reached after redirect.
-        await loginWithGoogle();
-      }
+      await signInWithPopup(auth, googleProvider);
+      // No need to call onLoginSuccess() manually — App.jsx's
+      // subscribeToAuthState listener will fire with the authed user
+      // and switch the view to Dashboard automatically.
     } catch (err) {
-      // auth/popup-closed-by-user is not a real error — just reset state.
+      // auth/popup-closed-by-user means user cancelled — not a real error.
       if (err?.code !== "auth/popup-closed-by-user") {
         setError(friendlyError(err));
       }

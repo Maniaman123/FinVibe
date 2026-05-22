@@ -184,24 +184,38 @@ export default function App() {
 
   // ── 1. Global Auth State Listener + Google Redirect Result ───────────────
   useEffect(() => {
-    // We must wait for getRedirectResult() to finish before trusting the
-    // first onAuthStateChanged(null) — otherwise a redirect login causes
-    // a flash back to the landing page before the session is established.
-    let redirectResolved = false;
+    /**
+     * Race Condition Fix:
+     * Firebase emits onAuthStateChanged(null) the instant the page loads,
+     * BEFORE getRedirectResult() finishes verifying the Google token.
+     *
+     * If we dismiss the loading gate on that first null, the router renders
+     * Landing page — then a moment later user IS authenticated, causing a
+     * jarring flash/redirect.
+     *
+     * Strategy: track two independent "done" signals. Only drop the loading
+     * gate when BOTH have fired. This guarantees Firebase has fully reconciled
+     * the session before we render any route.
+     */
+    let authSettled      = false; // onAuthStateChanged fired at least once
+    let redirectSettled  = false; // getRedirectResult() resolved or rejected
+
+    const tryDismissLoading = () => {
+      if (authSettled && redirectSettled) setLoading(false);
+    };
 
     const unsubscribeAuth = subscribeToAuthState((firebaseUser) => {
       setUser(firebaseUser);
-      // Only dismiss the loading screen after the redirect check is done.
-      if (redirectResolved) setLoading(false);
+      authSettled = true;
+      tryDismissLoading();
     });
 
     // Resolve any pending Google redirect (runs once on every app load).
     resolveGoogleRedirect()
-      .catch(() => {})
+      .catch(() => {}) // cancelled popup / no pending redirect = fine
       .finally(() => {
-        redirectResolved = true;
-        // Auth state has already settled — safe to show the UI now.
-        setLoading(false);
+        redirectSettled = true;
+        tryDismissLoading();
       });
 
     return () => unsubscribeAuth();

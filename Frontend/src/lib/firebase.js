@@ -1,9 +1,20 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  doc,
+  deleteDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  where,
+  limit,
+  startAfter,
+} from "firebase/firestore";
 import {
   getAuth,
   signInWithEmailAndPassword,
-  signInWithRedirect,
+  signInWithPopup,
   getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -33,48 +44,34 @@ export const googleProvider = new GoogleAuthProvider();
 
 /**
  * Sign in with Email & Password.
- * @param {string} email
- * @param {string} password
- * @returns {Promise<UserCredential>}
  */
 export const loginWithEmail = (email, password) =>
   signInWithEmailAndPassword(auth, email, password);
 
 /**
- * Sign in with Google via redirect (avoids COOP popup issues on Firebase Hosting).
- * Call getRedirectResult() on app load to handle the result after redirect.
- * @returns {Promise<void>}
- */
-export const loginWithGoogle = () =>
-  signInWithRedirect(auth, googleProvider);
-
-/**
  * Resolve the Google redirect result after returning from sign-in.
- * Should be called once on app startup.
- * @returns {Promise<UserCredential | null>}
+ * Called once on every app startup in App.jsx to reconcile any pending session.
+ * With signInWithPopup now used universally, this mainly serves as a no-op
+ * safety net — it resolves immediately with null if no redirect is pending.
  */
-export const resolveGoogleRedirect = () =>
-  getRedirectResult(auth);
+export const resolveGoogleRedirect = () => getRedirectResult(auth);
 
 /**
  * Sign out the current user.
- * @returns {Promise<void>}
  */
 export const logout = () => signOut(auth);
 
 /**
  * Subscribe to Firebase Auth state changes.
- * @param {function} callback - Called with (user | null) on every auth change.
- * @returns {function} Unsubscribe function.
  */
 export const subscribeToAuthState = (callback) =>
   onAuthStateChanged(auth, callback);
 
-// ── Firestore Real-Time Listener ──────────────────────────────────────────────
+// ── Firestore Real-Time Listeners ─────────────────────────────────────────────
 
 /**
  * Subscribe to real-time transaction updates from Firestore.
- * Ordered by most recent first.
+ * Ordered by most recent first. Returns ALL transactions (global collection).
  * @param {function} callback - Called with an array of transaction objects.
  * @returns {function} Unsubscribe function.
  */
@@ -84,11 +81,26 @@ export function subscribeToTransactions(callback) {
     orderBy("processed_at", "desc")
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    callback(data);
-  });
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      callback(data);
+    },
+    (error) => {
+      console.error("[Firestore] subscribeToTransactions error:", error);
+      callback([]);
+    }
+  );
 }
+
+/**
+ * Delete a transaction document from Firestore by its document ID.
+ * @param {string} docId - The Firestore document ID.
+ * @returns {Promise<void>}
+ */
+export const deleteTransaction = (docId) =>
+  deleteDoc(doc(db, "transactions", docId));

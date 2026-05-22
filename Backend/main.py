@@ -50,9 +50,26 @@ All monetary values must be plain floats (no currency symbols, no thousand separ
 Dates must follow ISO 8601: YYYY-MM-DD.
 """
 
-# ── Gemini Model Instances ─────────────────────────────────────────────────────
-OCR_MODEL   = GenerativeModel("gemini-1.5-pro",   system_instruction=SYSTEM_INSTRUCTION)
-COACH_MODEL = GenerativeModel("gemini-1.5-flash")
+# ── Gemini Model Instances (lazy — avoids startup crash if Vertex AI is unreachable) ──
+# Use versioned model names — unversioned aliases (gemini-1.5-pro) are deprecated
+# on Vertex AI and return 404. Pin to -001 for stable GA behaviour.
+_OCR_MODEL: GenerativeModel | None   = None
+_COACH_MODEL: GenerativeModel | None = None
+
+def get_ocr_model() -> GenerativeModel:
+    global _OCR_MODEL
+    if _OCR_MODEL is None:
+        _OCR_MODEL = GenerativeModel(
+            "gemini-1.5-pro-001",
+            system_instruction=SYSTEM_INSTRUCTION,
+        )
+    return _OCR_MODEL
+
+def get_coach_model() -> GenerativeModel:
+    global _COACH_MODEL
+    if _COACH_MODEL is None:
+        _COACH_MODEL = GenerativeModel("gemini-1.5-flash-001")
+    return _COACH_MODEL
 
 # ── OCR Prompt Template ────────────────────────────────────────────────────────
 OCR_PROMPT = """
@@ -115,7 +132,7 @@ def run_ocr(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
     image_part = Part.from_data(data=image_bytes, mime_type=mime_type)
     config     = GenerationConfig(temperature=0.1, max_output_tokens=2048)
 
-    response = OCR_MODEL.generate_content(
+    response = get_ocr_model().generate_content(
         [image_part, OCR_PROMPT],
         generation_config=config,
     )
@@ -154,7 +171,7 @@ Tulis TEPAT 2 kalimat dalam Bahasa Indonesia:
 Format output: Kembalikan HANYA 2 kalimat tersebut sebagai teks biasa. Tanpa JSON, tanpa bullet point, tanpa penomoran.
 """
     config   = GenerationConfig(temperature=0.7, max_output_tokens=256)
-    response = COACH_MODEL.generate_content(prompt, generation_config=config)
+    response = get_coach_model().generate_content(prompt, generation_config=config)
     tip      = response.text.strip()
     logger.info("Coach tip generated: %s", tip[:80])
     return tip

@@ -69,10 +69,14 @@ function CustomTooltip({ active, payload, label }) {
 // ── Monthly Trend Chart ────────────────────────────────────────────────────────
 export function MonthlyTrendChart({ data = [] }) {
   /**
-   * data: Array<{ month: string, "Raw Materials": number, Logistics: number,
+   * data: Array<{ label: string, "Raw Materials": number, Logistics: number,
    *               Utilities: number, Marketing: number, Others: number, total: number }>
+   * Supports both `month` and `label` as dataKey for backwards compatibility.
    */
   const categories = Object.keys(COLORS);
+  // Support both `month` and `label` keys from data
+  const hasData    = data.some((d) => d.total > 0);
+  const xKey       = data[0]?.label !== undefined ? "label" : "month";
 
   return (
     <div
@@ -84,52 +88,64 @@ export function MonthlyTrendChart({ data = [] }) {
           Tren Pengeluaran Bulanan
         </h3>
         <p className="text-xs mt-0.5 font-mono" style={{ color: AXIS_COLOR }}>
-          Breakdown per kategori · 6 bulan terakhir
+          Breakdown per kategori · {data.length} bulan terakhir
         </p>
       </div>
 
-      <ResponsiveContainer width="100%" height={280}>
-        <ComposedChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke={GRID_COLOR} vertical={false} />
-          <XAxis
-            dataKey="month"
-            tick={{ fill: AXIS_COLOR, fontSize: 11, fontFamily: "JetBrains Mono" }}
-            axisLine={{ stroke: GRID_COLOR }}
-            tickLine={false}
-          />
-          <YAxis
-            tickFormatter={formatIDR}
-            tick={{ fill: AXIS_COLOR, fontSize: 10, fontFamily: "JetBrains Mono" }}
-            axisLine={false}
-            tickLine={false}
-            width={56}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend
-            wrapperStyle={{ paddingTop: "16px", fontSize: "12px", fontFamily: "JetBrains Mono" }}
-            formatter={(value) => <span style={{ color: AXIS_COLOR }}>{value}</span>}
-          />
-          {categories.map((cat) => (
-            <Bar
-              key={cat}
-              dataKey={cat}
-              stackId="a"
-              fill={COLORS[cat]}
-              radius={cat === "Others" ? [4, 4, 0, 0] : [0, 0, 0, 0]}
-              opacity={0.85}
-            />
-          ))}
-          <Line
-            type="monotone"
-            dataKey="total"
-            stroke="#4edea3"
-            strokeWidth={2.5}
-            dot={{ fill: "#4edea3", r: 4, strokeWidth: 0 }}
-            activeDot={{ r: 6, fill: "#4edea3", strokeWidth: 0 }}
-            name="Total"
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
+      {!hasData ? (
+        <div
+          className="flex flex-col items-center justify-center rounded-xl"
+          style={{ height: 280, background: "rgba(73,68,84,0.15)", border: "1px dashed #494454" }}
+        >
+          <p className="text-3xl mb-2">📊</p>
+          <p className="text-xs font-mono" style={{ color: AXIS_COLOR }}>Belum ada data pengeluaran</p>
+        </div>
+      ) : (
+        <div style={{ width: "100%", height: 280 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID_COLOR} vertical={false} />
+              <XAxis
+                dataKey={xKey}
+                tick={{ fill: AXIS_COLOR, fontSize: 11, fontFamily: "JetBrains Mono" }}
+                axisLine={{ stroke: GRID_COLOR }}
+                tickLine={false}
+              />
+              <YAxis
+                tickFormatter={formatIDR}
+                tick={{ fill: AXIS_COLOR, fontSize: 10, fontFamily: "JetBrains Mono" }}
+                axisLine={false}
+                tickLine={false}
+                width={56}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                wrapperStyle={{ paddingTop: "16px", fontSize: "12px", fontFamily: "JetBrains Mono" }}
+                formatter={(value) => <span style={{ color: AXIS_COLOR }}>{value}</span>}
+              />
+              {categories.map((cat) => (
+                <Bar
+                  key={cat}
+                  dataKey={cat}
+                  stackId="a"
+                  fill={COLORS[cat]}
+                  radius={cat === "Others" ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                  opacity={0.85}
+                />
+              ))}
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="#4edea3"
+                strokeWidth={2.5}
+                dot={{ fill: "#4edea3", r: 4, strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: "#4edea3", strokeWidth: 0 }}
+                name="Total"
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 }
@@ -186,30 +202,42 @@ export function CategoryDonutChart({ data = [] }) {
         </p>
       </div>
 
-      <ResponsiveContainer width="100%" height={260}>
-        <PieChart>
-          <Pie
-            activeIndex={activeIndex}
-            activeShape={ActiveShape}
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={72}
-            outerRadius={100}
-            dataKey="value"
-            onMouseEnter={(_, index) => setActiveIndex(index)}
-            stroke="none"
-          >
-            {data.map((entry, index) => (
-              <Cell
-                key={entry.name}
-                fill={COLORS[entry.name] ?? "#958ea0"}
-                opacity={index === activeIndex ? 1 : 0.65}
-              />
-            ))}
-          </Pie>
-        </PieChart>
-      </ResponsiveContainer>
+      {data.length === 0 ? (
+        <div
+          className="flex flex-col items-center justify-center rounded-xl"
+          style={{ height: 260, background: "rgba(73,68,84,0.15)", border: "1px dashed #494454" }}
+        >
+          <p className="text-3xl mb-2">🥧</p>
+          <p className="text-xs font-mono" style={{ color: AXIS_COLOR }}>Belum ada data kategori</p>
+        </div>
+      ) : (
+        <div style={{ width: "100%", height: 260 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                activeIndex={activeIndex}
+                activeShape={ActiveShape}
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius={72}
+                outerRadius={100}
+                dataKey="value"
+                onMouseEnter={(_, index) => setActiveIndex(index)}
+                stroke="none"
+              >
+                {data.map((entry, index) => (
+                  <Cell
+                    key={entry.name}
+                    fill={COLORS[entry.name] ?? "#958ea0"}
+                    opacity={index === activeIndex ? 1 : 0.65}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="grid grid-cols-1 gap-1.5 mt-1">
@@ -250,8 +278,9 @@ export function SparklineChart({ data = [], color = "#4edea3", label = "" }) {
    * data: Array<{ name: string, value: number }>
    * A small inline chart for KPI cards.
    */
+  if (!data || data.length < 2) return null;
   return (
-    <div className="w-full" style={{ height: 48 }}>
+    <div style={{ width: "100%", height: 48 }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
           <Line
