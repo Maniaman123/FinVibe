@@ -22,12 +22,13 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBy2ZUcPvny0lxeJYFcT8dPTf4REcW7u9k",
-  authDomain: "finvibe-baa9d.firebaseapp.com",
-  projectId: "finvibe-baa9d",
-  storageBucket: "finvibe-baa9d.firebasestorage.app",
-  messagingSenderId: "956218500440",
-  appId: "1:956218500440:web:d7448595c5d55b051a712d",
+  apiKey: "AIzaSyBpa6Jwtv_FgxblR2JYLn4bCU68a-zHVH0",
+  authDomain: "projek-juaravibecoding.firebaseapp.com",
+  projectId: "projek-juaravibecoding",
+  storageBucket: "projek-juaravibecoding.firebasestorage.app",
+  messagingSenderId: "506277879291",
+  appId: "1:506277879291:web:f8333f661e4b2f1880ff5e",
+  measurementId: "G-RK3SGZ7P93"
 };
 
 // ── App Initialization ────────────────────────────────────────────────────────

@@ -60,7 +60,7 @@ def get_ocr_model() -> GenerativeModel:
     global _OCR_MODEL
     if _OCR_MODEL is None:
         _OCR_MODEL = GenerativeModel(
-            "gemini-1.5-pro-001",
+            "gemini-2.5-flash",
             system_instruction=SYSTEM_INSTRUCTION,
         )
     return _OCR_MODEL
@@ -68,7 +68,7 @@ def get_ocr_model() -> GenerativeModel:
 def get_coach_model() -> GenerativeModel:
     global _COACH_MODEL
     if _COACH_MODEL is None:
-        _COACH_MODEL = GenerativeModel("gemini-1.5-flash-001")
+        _COACH_MODEL = GenerativeModel("gemini-2.5-flash")
     return _COACH_MODEL
 
 # ── OCR Prompt Template ────────────────────────────────────────────────────────
@@ -106,7 +106,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://finvibe-baa9d.web.app"],
+    allow_origins=["https://projek-juaravibecoding.web.app",
+    "https://projek-juaravibecoding.firebaseapp.com",], # Local development only
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
